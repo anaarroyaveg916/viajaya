@@ -1,9 +1,13 @@
 package com.dayana.viajaya.controllers;
 
 import com.dayana.viajaya.entities.Reserva;
+import com.dayana.viajaya.services.IComprobanteService;
 import com.dayana.viajaya.services.IReservaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -13,6 +17,7 @@ import java.util.List;
 @RequestMapping("/reservas")
 public class ReservaController {
     private final IReservaService reservaService;
+    private final IComprobanteService comprobanteService;
 
     //public ReservaController(IReservaService reservaService) {
       //  this.reservaService = reservaService;
@@ -33,6 +38,20 @@ public class ReservaController {
     @GetMapping("/usuario/{usuarioId}")
     public List<Reserva> findByUsuarioId(@PathVariable Integer usuarioId) {
         return reservaService.findByUsuarioId(usuarioId);
+    }
+
+    @GetMapping("/{id}/comprobante")
+    public ResponseEntity<byte[]> generarComprobante(
+            @PathVariable Integer id, @RequestParam Integer usuarioId) {
+        byte[] comprobante = comprobanteService.generarComprobantePdf(id, usuarioId);
+        if (comprobante == null) return ResponseEntity.notFound().build();
+        ContentDisposition adjunto = ContentDisposition.attachment()
+                .filename("comprobante-reserva-" + id + ".pdf")
+                .build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, adjunto.toString())
+                .body(comprobante);
     }
 
     @PostMapping
