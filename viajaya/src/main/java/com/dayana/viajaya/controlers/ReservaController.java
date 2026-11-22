@@ -1,5 +1,6 @@
 package com.dayana.viajaya.controllers;
 
+import com.dayana.viajaya.dtos.ConfirmacionReservaDTO;
 import com.dayana.viajaya.entities.Reserva;
 import com.dayana.viajaya.services.IComprobanteService;
 import com.dayana.viajaya.services.IReservaService;
@@ -38,6 +39,14 @@ public class ReservaController {
     @GetMapping("/usuario/{usuarioId}")
     public List<Reserva> findByUsuarioId(@PathVariable Integer usuarioId) {
         return reservaService.findByUsuarioId(usuarioId);
+    }
+
+    @GetMapping("/{id}/confirmacion")
+    public ResponseEntity<ConfirmacionReservaDTO> obtenerConfirmacion(
+            @PathVariable Integer id, @RequestParam Integer usuarioId) {
+        ConfirmacionReservaDTO confirmacion = comprobanteService.obtenerConfirmacion(id, usuarioId);
+        if (confirmacion == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(confirmacion);
     }
 
     @GetMapping("/{id}/comprobante")

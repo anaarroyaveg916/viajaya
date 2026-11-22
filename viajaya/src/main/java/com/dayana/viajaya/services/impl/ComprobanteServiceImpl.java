@@ -1,5 +1,6 @@
 package com.dayana.viajaya.services.impl;
 
+import com.dayana.viajaya.dtos.ConfirmacionReservaDTO;
 import com.dayana.viajaya.entities.Reserva;
 import com.dayana.viajaya.entities.Usuario;
 import com.dayana.viajaya.repositories.IReservaRepository;
@@ -35,6 +36,8 @@ public class ComprobanteServiceImpl implements IComprobanteService {
     private final IReservaRepository reservaRepository;
     private final IUsuarioRepository usuarioRepository;
 
+    private static final String SERVICIO_RESERVA = "Reserva de viaje";
+
     private static final Color COLOR_BORDE = new Color(200, 200, 200);
 
     private static final Font FUENTE_MARCA = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, Color.BLACK);
@@ -49,7 +52,7 @@ public class ComprobanteServiceImpl implements IComprobanteService {
     private static final Locale LOCALE_COLOMBIA = Locale.of("es", "CO");
 
     @Override
-    public byte[] generarComprobantePdf(Integer reservaId, Integer usuarioId) {
+    public ConfirmacionReservaDTO obtenerConfirmacion(Integer reservaId, Integer usuarioId) {
         Reserva reserva = reservaRepository.findById(reservaId).orElse(null);
         // Si la reserva no existe o no pertenece al usuario se responde igual,
         // para no revelar la existencia ni los datos de reservas ajenas.
@@ -60,14 +63,32 @@ public class ComprobanteServiceImpl implements IComprobanteService {
         if (titular == null) {
             return null;
         }
+        return new ConfirmacionReservaDTO(
+                reserva.getId(),
+                generarCodigo(reserva),
+                SERVICIO_RESERVA,
+                reserva.getDestino(),
+                reserva.getFechaReserva(),
+                reserva.getValor(),
+                reserva.getEstado(),
+                titular
+        );
+    }
+
+    @Override
+    public byte[] generarComprobantePdf(Integer reservaId, Integer usuarioId) {
+        ConfirmacionReservaDTO confirmacion = obtenerConfirmacion(reservaId, usuarioId);
+        if (confirmacion == null) {
+            return null;
+        }
 
         ByteArrayOutputStream salida = new ByteArrayOutputStream();
         try (Document documento = new Document(PageSize.A4, 50, 50, 50, 50)) {
             PdfWriter.getInstance(documento, salida);
             documento.open();
-            agregarEncabezado(documento, reserva);
-            agregarDatosTitular(documento, titular);
-            agregarDetalleServicio(documento, reserva);
+            agregarEncabezado(documento, confirmacion);
+            agregarDatosTitular(documento, confirmacion.getTitular());
+            agregarDetalleServicio(documento, confirmacion);
             agregarPiePagina(documento);
         } catch (DocumentException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible generar el comprobante de la reserva");
@@ -79,18 +100,18 @@ public class ComprobanteServiceImpl implements IComprobanteService {
         return String.format("VJY-%06d", reserva.getId());
     }
 
-    private void agregarEncabezado(Document documento, Reserva reserva) {
+    private void agregarEncabezado(Document documento, ConfirmacionReservaDTO confirmacion) {
         PdfPTable encabezado = new PdfPTable(new float[]{4, 1, 2});
         encabezado.setWidthPercentage(100);
         encabezado.setSpacingAfter(25);
 
         encabezado.addCell(crearCeldaEncabezado("ViajaYa", FUENTE_MARCA));
         encabezado.addCell(crearCeldaEncabezado("Código", FUENTE_NORMAL));
-        encabezado.addCell(crearCeldaEncabezado(generarCodigo(reserva), FUENTE_NEGRITA));
+        encabezado.addCell(crearCeldaEncabezado(confirmacion.getCodigo(), FUENTE_NEGRITA));
 
         encabezado.addCell(crearCeldaEncabezado("Comprobante de reserva", FUENTE_SUBTITULO));
         encabezado.addCell(crearCeldaEncabezado("Estado", FUENTE_NORMAL));
-        encabezado.addCell(crearCeldaEncabezado(reserva.getEstado().toUpperCase(LOCALE_COLOMBIA), FUENTE_NEGRITA));
+        encabezado.addCell(crearCeldaEncabezado(confirmacion.getEstado().toUpperCase(LOCALE_COLOMBIA), FUENTE_NEGRITA));
 
         documento.add(encabezado);
     }
@@ -104,14 +125,14 @@ public class ComprobanteServiceImpl implements IComprobanteService {
         documento.add(tabla);
     }
 
-    private void agregarDetalleServicio(Document documento, Reserva reserva) {
+    private void agregarDetalleServicio(Document documento, ConfirmacionReservaDTO confirmacion) {
         NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(LOCALE_COLOMBIA);
         documento.add(crearTituloSeccion("Detalle del servicio"));
         PdfPTable tabla = crearTablaDetalle();
-        agregarFila(tabla, "Servicio", "Reserva de viaje");
-        agregarFila(tabla, "Destino", reserva.getDestino());
-        agregarFila(tabla, "Fecha de reserva", reserva.getFechaReserva().format(FORMATO_FECHA));
-        agregarFila(tabla, "Valor total", formatoMoneda.format(reserva.getValor()) + " COP");
+        agregarFila(tabla, "Servicio", confirmacion.getServicio());
+        agregarFila(tabla, "Destino", confirmacion.getDestino());
+        agregarFila(tabla, "Fecha de reserva", confirmacion.getFechaReserva().format(FORMATO_FECHA));
+        agregarFila(tabla, "Valor total", formatoMoneda.format(confirmacion.getValor()) + " COP");
         documento.add(tabla);
     }
 
