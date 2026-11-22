@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,6 +63,16 @@ public class ReservaController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, adjunto.toString())
                 .body(comprobante);
+    }
+
+    @PostMapping("/{id}/comprobante/correo")
+    public ResponseEntity<Map<String, String>> enviarComprobantePorCorreo(
+            @PathVariable Integer id, @RequestParam Integer usuarioId) {
+        String correo = comprobanteService.enviarComprobantePorCorreo(id, usuarioId);
+        if (correo == null) return ResponseEntity.notFound().build();
+        Map<String, String> respuesta = new HashMap<>();
+        respuesta.put("mensaje", "El comprobante fue enviado al correo " + correo);
+        return ResponseEntity.ok(respuesta);
     }
 
     @PostMapping

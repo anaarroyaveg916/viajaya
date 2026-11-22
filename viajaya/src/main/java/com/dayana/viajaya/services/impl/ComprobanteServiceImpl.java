@@ -6,6 +6,7 @@ import com.dayana.viajaya.entities.Usuario;
 import com.dayana.viajaya.repositories.IReservaRepository;
 import com.dayana.viajaya.repositories.IUsuarioRepository;
 import com.dayana.viajaya.services.IComprobanteService;
+import com.dayana.viajaya.services.ICorreoService;
 import lombok.RequiredArgsConstructor;
 import org.openpdf.text.Document;
 import org.openpdf.text.DocumentException;
@@ -35,6 +36,7 @@ import java.util.Locale;
 public class ComprobanteServiceImpl implements IComprobanteService {
     private final IReservaRepository reservaRepository;
     private final IUsuarioRepository usuarioRepository;
+    private final ICorreoService correoService;
 
     private static final String SERVICIO_RESERVA = "Reserva de viaje";
 
@@ -81,7 +83,21 @@ public class ComprobanteServiceImpl implements IComprobanteService {
         if (confirmacion == null) {
             return null;
         }
+        return construirPdf(confirmacion);
+    }
 
+    @Override
+    public String enviarComprobantePorCorreo(Integer reservaId, Integer usuarioId) {
+        ConfirmacionReservaDTO confirmacion = obtenerConfirmacion(reservaId, usuarioId);
+        if (confirmacion == null) {
+            return null;
+        }
+        // Solo se envía al correo registrado del titular, nunca a una dirección recibida en la petición.
+        correoService.enviarComprobante(confirmacion, construirPdf(confirmacion));
+        return confirmacion.getTitular().getCorreo();
+    }
+
+    private byte[] construirPdf(ConfirmacionReservaDTO confirmacion) {
         ByteArrayOutputStream salida = new ByteArrayOutputStream();
         try (Document documento = new Document(PageSize.A4, 50, 50, 50, 50)) {
             PdfWriter.getInstance(documento, salida);
