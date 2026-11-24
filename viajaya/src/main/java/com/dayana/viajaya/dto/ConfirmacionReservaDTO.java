@@ -1,4 +1,4 @@
-package com.dayana.viajaya.dtos;
+package com.dayana.viajaya.dto;
 
 import com.dayana.viajaya.entities.Usuario;
 import lombok.AllArgsConstructor;

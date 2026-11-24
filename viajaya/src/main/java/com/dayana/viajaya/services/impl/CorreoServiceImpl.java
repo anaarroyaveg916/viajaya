@@ -1,6 +1,6 @@
 package com.dayana.viajaya.services.impl;
 
-import com.dayana.viajaya.dtos.ConfirmacionReservaDTO;
+import com.dayana.viajaya.dto.ConfirmacionReservaDTO;
 import com.dayana.viajaya.services.ICorreoService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

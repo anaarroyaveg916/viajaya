@@ -1,6 +1,6 @@
 package com.dayana.viajaya.services;
 
-import com.dayana.viajaya.dtos.ConfirmacionReservaDTO;
+import com.dayana.viajaya.dto.ConfirmacionReservaDTO;
 
 public interface IComprobanteService {
     ConfirmacionReservaDTO obtenerConfirmacion(Integer reservaId, Integer usuarioId);

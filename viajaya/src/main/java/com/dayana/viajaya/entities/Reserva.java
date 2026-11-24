@@ -1,9 +1,11 @@
+
 package com.dayana.viajaya.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -13,6 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Reserva {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -30,7 +33,18 @@ public class Reserva {
     @Column(name = "estado", nullable = false, length = 30)
     private String estado;
 
-    // Llave foránea como Integer, siguiendo el patrón del documento base.
     @Column(name = "usuario_id", nullable = false)
     private Integer usuarioId;
+
+    @Column(name = "vuelo_id")
+    private Integer vueloId;
+
+    @Column(name = "cantidad_pasajeros")
+    private Integer cantidadPasajeros;
+
+    @Column(name = "correo_contacto", length = 150)
+    private String correoContacto;
+
+    @Column(name = "telefono_contacto", length = 20)
+    private String telefonoContacto;
 }

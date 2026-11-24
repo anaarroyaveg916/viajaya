@@ -1,6 +1,6 @@
 package com.dayana.viajaya.services.impl;
 
-import com.dayana.viajaya.dtos.ConfirmacionReservaDTO;
+import com.dayana.viajaya.dto.ConfirmacionReservaDTO;
 import com.dayana.viajaya.entities.Reserva;
 import com.dayana.viajaya.entities.Usuario;
 import com.dayana.viajaya.repositories.IReservaRepository;

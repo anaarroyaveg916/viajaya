@@ -54,4 +54,7 @@ public class Vuelo {
 
     @Column(name = "cupos_disponibles", nullable = false)
     private Integer cuposDisponibles;
+
+    @Column(name = "cupos_totales", nullable = false)
+    private Integer cuposTotales;
 }
