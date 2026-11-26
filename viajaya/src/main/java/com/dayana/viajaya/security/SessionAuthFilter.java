@@ -53,7 +53,10 @@ public class SessionAuthFilter extends OncePerRequestFilter {
         if (path == null) {
             return true;
         }
-        if (path.equals("/api/auth/login") || path.startsWith("/api/vuelos")) {
+        // Públicas: login, registro y catálogo de vuelos (context-path=/api).
+        if (path.equals("/api/auth/login")
+                || path.equals("/api/usuarios/registro")
+                || path.startsWith("/api/vuelos")) {
             return false;
         }
         return path.startsWith("/api/usuarios") || path.startsWith("/api/reservas");

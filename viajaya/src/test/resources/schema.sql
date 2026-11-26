@@ -1,5 +1,5 @@
 -- Esquema para las pruebas (H2 en modo MySQL).
--- Mismas tablas de database/viajaya_completo.sql + migración database/pvy20_iniciar_reserva.sql.
+-- Alineado con database/viajaya_completo.sql (usuarios+password_hash, reservas PVY-20, pasajeros, bloqueos).
 DROP TABLE IF EXISTS bloqueos_cupos;
 DROP TABLE IF EXISTS pasajeros;
 DROP TABLE IF EXISTS reservas;
@@ -11,7 +11,8 @@ CREATE TABLE usuarios (
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     correo VARCHAR(150) NOT NULL UNIQUE,
-    telefono VARCHAR(20)
+    telefono VARCHAR(20),
+    password_hash VARCHAR(255) NULL
 );
 
 CREATE TABLE vuelos (

@@ -8,10 +8,9 @@ USE viajaya;
 ALTER TABLE usuarios
     ADD COLUMN password_hash VARCHAR(255) NULL AFTER telefono;
 
--- Ejemplo de hash BCrypt (corresponde a la clave de prueba: ViajaYa123!)
--- Al implementar BCryptPasswordEncoder en el servicio, los nuevos usuarios
--- y cambios de clave generaran su propio hash automaticamente.
+-- Hash BCrypt de la clave de prueba: ViajaYa123
+-- Los registros vía POST /api/usuarios/registro generan su propio hash.
 UPDATE usuarios
-SET password_hash = '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Vz8q4G7x1x1x1x1x1x1x1x1x1x1u'
-WHERE correo IN ('laura@gmail.com', 'carlos@gmail.com','santik@gmail.com')
+SET password_hash = '$2b$10$iwGdLJbt3RKAxNQwyS.IIep3UtHTJZznOGO796jR3zRgp0sOB.BMu'
+WHERE correo IN ('laura@gmail.com', 'carlos@gmail.com', 'santik@gmail.com')
   AND password_hash IS NULL;

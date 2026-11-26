@@ -1,22 +1,30 @@
 package com.dayana.viajaya.controllers;
 
+import com.dayana.viajaya.dto.RegistroUsuarioRequest;
+import com.dayana.viajaya.dto.RegistroUsuarioResponse;
 import com.dayana.viajaya.entities.Usuario;
+import com.dayana.viajaya.exceptions.RegistroValidacionException;
 import com.dayana.viajaya.services.IUsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/usuarios")
 public class UsuarioController {
+
     private final IUsuarioService usuarioService;
 
-    //public UsuarioController(IUsuarioService usuarioService) {
-      //  this.usuarioService = usuarioService;
-    //}
+    @PostMapping("/registro")
+    public ResponseEntity<RegistroUsuarioResponse> registrar(@RequestBody RegistroUsuarioRequest request) {
+        RegistroUsuarioResponse response = usuarioService.registrar(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @GetMapping
     public List<Usuario> findAll() {
@@ -48,5 +56,13 @@ public class UsuarioController {
         if (usuarioService.findById(id) == null) return ResponseEntity.notFound().build();
         usuarioService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(RegistroValidacionException.class)
+    public ResponseEntity<Map<String, Object>> manejarErrorRegistro(RegistroValidacionException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "error", ex.getMessage(),
+                "campos", ex.getErroresPorCampo()
+        ));
     }
 }
