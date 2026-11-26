@@ -1,5 +1,6 @@
 package com.dayana.viajaya.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,4 +28,8 @@ public class Usuario {
 
     @Column(name = "telefono", length = 20)
     private String telefono;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name = "password_hash", length = 255)
+    private String passwordHash;
 }
