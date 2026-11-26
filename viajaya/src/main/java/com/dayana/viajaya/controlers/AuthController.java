@@ -56,13 +56,13 @@ public class AuthController {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity> manejarErrorAutenticacion(IllegalArgumentException ex) {
+    public ResponseEntity manejarErrorAutenticacion(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity> manejarErrorGeneral(Exception ex) {
+    public ResponseEntity manejarErrorGeneral(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "No fue posible procesar la solicitud de autenticación"));
     }
